@@ -1,10 +1,11 @@
 from pyrogram import Client
 import time
 import schedule
+import os
 
-api_id = 24639906
-api_hash = 'a125d1dd3a48acafb671a4033c8e2ce5'
-bot_token = '6946754420:AAGVbbxuvU-HZA1ehjfdBl01LdOSOfcV_Ow'
+api_id = int(os.environ.get('API_ID'))
+api_hash = os.environ.get('API_HASH')
+bot_token = os.environ.get('BOT_TOKEN')
 
 app = Client(name='my_bot', api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 

@@ -7,8 +7,19 @@ on:
       - main
 
 jobs:
-  example_job:
+  my-job:
     runs-on: ubuntu-latest
     steps:
-      - name: Use the secret
-        run: echo "The secret value is ${{ secrets.API_ID }"
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install pyrogram schedule
+      - name: Run Python script
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          python main.py
