@@ -3,7 +3,7 @@ import time
 import schedule
 import os
 
-api_id = int(os.environ.get('API_ID'))
+api_id = os.environ.get('API_ID')
 api_hash = os.environ.get('API_HASH')
 bot_token = os.environ.get('BOT_TOKEN')
 
@@ -15,7 +15,7 @@ def send_good_morning():
     app.send_message('yantestc', "Доброе утро")
 
 
-schedule.every().day.at("12:23").do(send_good_morning)  # Тут можно менять время отправки
+schedule.every().day.at("17:55").do(send_good_morning)  # Тут можно менять время отправки
 
 
 def run_schedule():
