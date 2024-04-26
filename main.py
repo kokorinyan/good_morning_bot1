@@ -20,7 +20,7 @@ def send_good_morning():
     app.send_message('yantestc', "Доброе утро")
 
 
-schedule.every().day.at("13:09").do(send_good_morning)  # Тут можно менять время отправки
+schedule.every().day.at("10:00").do(send_good_morning)  # Тут можно менять время отправки
 
 
 def run_schedule():
