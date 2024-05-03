@@ -15,5 +15,11 @@ jobs:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          SUBSCRIPTION_KEY1: : ${{ secrets.SUBSCRIPTION_KEY1 }}
+          SUBSCRIPTION_KEY2: : ${{ secrets.SUBSCRIPTION_KEY2 }}
+          ENDPOINT: ${{ secrets.ENDPOINT }}
+          CUSTOM_CONFIG_ID: ${{ secrets.CUSTOM_CONFIG_ID }}
+
+
         run: |
           python main.py
