@@ -2,7 +2,6 @@ import requests
 from pyrogram import Client
 import time
 import schedule
-import os
 import pyodbc
 from environs import Env
 
@@ -41,8 +40,8 @@ def save_news(title, url):
 
 def get_bing_news(search_term):
     """Функция принимает и отправляет bing новости в канал"""
-    subscription_key1 = os.environ.get('SUBSCRIPTION_KEY1')
-    subscription_key2 = os.environ.get('SUBSCRIPTION_KEY2')
+    subscription_key1 = env.str('SUBSCRIPTION_KEY1')
+    subscription_key2 = env.str('SUBSCRIPTION_KEY2')
 
     endpoint = env.str('ENDPOINT')
     custom_config_id = env.str('CUSTOM_CONFIG_ID')
