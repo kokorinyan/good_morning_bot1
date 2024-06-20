@@ -3,16 +3,40 @@ from pyrogram import Client
 import time
 import schedule
 import os
+import pyodbc
+from environs import Env
 
-api_id = os.environ.get('API_ID')
-api_hash = os.environ.get('API_HASH')
-bot_token = os.environ.get('BOT_TOKEN')
+env = Env()
+env.read_env('./.env')
+api_id = env.int('API_ID')
+api_hash = env.str('API_HASH')
+bot_token = env.str('BOT_TOKEN')
+db_connection_string = env.str('DB_CONNECTION_STRING')
+
+
 app = Client(name='my_bot', api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 
-def send_startup_message():
-    """Фунция для проверки бота"""
-    app.send_message('yantestc', "Бот запущен")
+def get_db_connection():
+    conn = pyodbc.connect(db_connection_string)
+    return conn
+
+
+def news_exist(title, url):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(1) FROM SentNews WHERE Title = ? AND Url = ?", (title, url))
+    exists = cursor.fetchone()[0] > 0
+    conn.close()
+    return exists
+
+
+def save_news(title, url):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO SentNews (Title, Url) VALUES (?, ?)", (title, url))
+    conn.commit()
+    conn.close()
 
 
 def get_bing_news(search_term):
@@ -20,8 +44,8 @@ def get_bing_news(search_term):
     subscription_key1 = os.environ.get('SUBSCRIPTION_KEY1')
     subscription_key2 = os.environ.get('SUBSCRIPTION_KEY2')
 
-    endpoint = os.environ.get('ENDPOINT')
-    custom_config_id = os.environ.get('CUSTOM_CONFIG_ID')
+    endpoint = env.str('ENDPOINT')
+    custom_config_id = env.str('CUSTOM_CONFIG_ID')
     market = "en-US"
 
     url = (endpoint + "v7.0/custom/search?q=" + search_term + "&customconfig=" +
@@ -41,10 +65,14 @@ def get_bing_news(search_term):
     if 'webPages' in data:
         news = data['webPages']['value']
         for article in news:
-            try:
-                app.send_message('yantestc', f"{article['name']}: {article['url']}")
-            except Exception as e:
-                print("Error", e)
+            title = article['name']
+            url = article['url']
+            if not news_exist(title, url):
+                try:
+                    app.send_message('yantestc', f"{article['name']}: {article['url']}")
+                    save_news(title, url)
+                except Exception as e:
+                    print("Error", e)
         return news
     else:
         app.send_message('yantestc', "Новости не найдены")
@@ -62,7 +90,7 @@ def run_schedule():
             schedule.every().day.at("10:00").do(send_good_morning)  # Тут можно менять время отправки
             schedule.every().day.at("10:00").do(lambda: get_bing_news('technology'))
             schedule.every().day.at("12:00").do(lambda: get_bing_news('technology'))
-            schedule.every().day.at("14:30").do(lambda: get_bing_news('technology'))
+            schedule.every().day.at("14:00").do(lambda: get_bing_news('technology'))
             schedule.every().day.at("17:00").do(lambda: get_bing_news('technology'))
             while True:
                 schedule.run_pending()
@@ -71,8 +99,40 @@ def run_schedule():
         print("Error!", e)
 
 
+# test functions
+def send_startup_message():
+    """Фунция для проверки бота"""
+    app.send_message('yantestc', "Бот запущен")
+
+
+def test_db_connection():
+    try:
+        conn = pyodbc.connect(db_connection_string)
+        print("Connection successful!")
+        conn.close()
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+
+
+def print_saved_news():
+    """Функция для получения и вывода сохраненной информации из базы данных в консоль"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT Title, Url FROM SentNews")
+    rows = cursor.fetchall()
+    for row in rows:
+        print(f"Title: {row[0]}, URL: {row[1]}")
+    conn.close()
+
+
+def test_code():
+    send_startup_message()
+    test_db_connection()
+    print_saved_news()
+
+
 if __name__ == "__main__":
     app.start()
-    send_startup_message()
+    test_code()
     get_bing_news('technology')
     run_schedule()

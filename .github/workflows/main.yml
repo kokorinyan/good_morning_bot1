@@ -19,7 +19,7 @@ jobs:
           SUBSCRIPTION_KEY2: : ${{ secrets.SUBSCRIPTION_KEY2 }}
           ENDPOINT: ${{ secrets.ENDPOINT }}
           CUSTOM_CONFIG_ID: ${{ secrets.CUSTOM_CONFIG_ID }}
-
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
 
         run: |
           python main.py
