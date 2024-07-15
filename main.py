@@ -61,6 +61,8 @@ def get_bing_news(search_term):
     else:
         data = response1.json()
 
+    new_news_found = False
+
     if 'webPages' in data:
         news = data['webPages']['value']
         for article in news:
@@ -70,8 +72,11 @@ def get_bing_news(search_term):
                 try:
                     app.send_message('yantestc', f"{article['name']}: {article['url']}")
                     save_news(title, url)
+                    new_news_found = True
                 except Exception as e:
                     print("Error", e)
+        if not new_news_found:
+            app.send_message('yantestc', "Новых новостей пока нет")
         return news
     else:
         app.send_message('yantestc', "Новости не найдены")
